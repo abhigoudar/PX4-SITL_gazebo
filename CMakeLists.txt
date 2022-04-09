@@ -359,6 +359,7 @@ add_library(gazebo_opticalflow_plugin SHARED src/gazebo_opticalflow_plugin.cpp)
 add_library(gazebo_sonar_plugin SHARED src/gazebo_sonar_plugin.cpp)
 add_library(gazebo_uuv_plugin SHARED src/gazebo_uuv_plugin.cpp)
 add_library(gazebo_vision_plugin SHARED src/gazebo_vision_plugin.cpp)
+add_library(gazebo_mocap_plugin SHARED src/gazebo_mocap_plugin.cpp)
 add_library(gazebo_controller_interface SHARED src/gazebo_controller_interface.cpp)
 add_library(gazebo_gimbal_controller_plugin SHARED src/gazebo_gimbal_controller_plugin.cpp)
 add_library(gazebo_imu_plugin SHARED src/gazebo_imu_plugin.cpp)
@@ -386,6 +387,7 @@ set(plugins
   gazebo_sonar_plugin
   gazebo_uuv_plugin
   gazebo_vision_plugin
+  gazebo_mocap_plugin
   gazebo_controller_interface
   gazebo_gimbal_controller_plugin
   gazebo_imu_plugin

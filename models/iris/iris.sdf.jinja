@@ -577,5 +577,12 @@
       <accelerometerBiasCorrelationTime>300.0</accelerometerBiasCorrelationTime>
       <accelerometerTurnOnBiasSigma>0.196</accelerometerTurnOnBiasSigma>
     </plugin>
+    <plugin name="mocap_plugin" filename="libgazebo_mocap_plugin.so">
+        <robotNamespace></robotNamespace>
+        <pubRate>100</pubRate>
+        <randomWalk>0.1</randomWalk>
+        <noiseDensity>0.01</noiseDensity>
+        <corellationTime>60.0</corellationTime>
+    </plugin>
   </model>
 </sdf>
