@@ -158,9 +158,9 @@ void MocapPlugin::OnUpdate(const common::UpdateInfo&)
     odom_msg.set_time_usec(current_time.Double() * 1e6);
 
     gazebo::msgs::Vector3d* position = new gazebo::msgs::Vector3d();
-    position->set_x(pose_model.Pos().X();// + noise_pos.X() + _bias.X());
-    position->set_y(pose_model.Pos().Y();// + noise_pos.Y() + _bias.Y());
-    position->set_z(pose_model.Pos().Z();// + noise_pos.Z() + _bias.Z());
+    position->set_x(pose_model.Pos().X());// + noise_pos.X() + _bias.X());
+    position->set_y(pose_model.Pos().Y());// + noise_pos.Y() + _bias.Y());
+    position->set_z(pose_model.Pos().Z());// + noise_pos.Z() + _bias.Z());
     odom_msg.set_allocated_position(position);
 
     ignition::math::Quaterniond pose_model_quaternion = pose_model.Rot();
@@ -172,15 +172,15 @@ void MocapPlugin::OnUpdate(const common::UpdateInfo&)
     odom_msg.set_allocated_orientation(orientation);
 
     gazebo::msgs::Vector3d* linear_velocity = new gazebo::msgs::Vector3d();
-    linear_velocity->set_x(velocity_model_world.X();// + noise_linvel.X());
-    linear_velocity->set_y(velocity_model_world.Y();// + noise_linvel.Y());
-    linear_velocity->set_z(velocity_model_world.Z();// + noise_linvel.Z());
+    linear_velocity->set_x(velocity_model_world.X());// + noise_linvel.X());
+    linear_velocity->set_y(velocity_model_world.Y());// + noise_linvel.Y());
+    linear_velocity->set_z(velocity_model_world.Z());// + noise_linvel.Z());
     odom_msg.set_allocated_linear_velocity(linear_velocity);
 
     gazebo::msgs::Vector3d* angular_velocity = new gazebo::msgs::Vector3d();
-    angular_velocity->set_x(angular_velocity_model.X();// + noise_angvel.X());
-    angular_velocity->set_y(angular_velocity_model.Y();// + noise_angvel.Y());
-    angular_velocity->set_z(angular_velocity_model.Z();// + noise_angvel.Z());
+    angular_velocity->set_x(angular_velocity_model.X());// + noise_angvel.X());
+    angular_velocity->set_y(angular_velocity_model.Y());// + noise_angvel.Y());
+    angular_velocity->set_z(angular_velocity_model.Z());// + noise_angvel.Z());
     odom_msg.set_allocated_angular_velocity(angular_velocity);
 
     // for (int i = 0; i < 36; i++){
