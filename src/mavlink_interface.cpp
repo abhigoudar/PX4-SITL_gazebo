@@ -19,17 +19,18 @@ void MavlinkInterface::Load()
       abort();
     }
   }
-  local_qgc_addr_.sin_port = 0;
+  local_qgc_addr_.sin_addr.s_addr = htonl(INADDR_ANY);
   if (qgc_addr_ != "INADDR_ANY") {
-    local_qgc_addr_.sin_port = inet_addr(qgc_addr_.c_str());
-    if (local_qgc_addr_.sin_port == 0) {
+    local_qgc_addr_.sin_addr.s_addr = inet_addr(qgc_addr_.c_str());
+    if (local_qgc_addr_.sin_addr.s_addr == INADDR_NONE) {
       std::cerr << "Invalid qgc_addr: " << qgc_addr_ << ", aborting\n";
       abort();
     }
   }
+  local_sdk_addr_.sin_addr.s_addr = htonl(INADDR_ANY);
   if (sdk_addr_ != "INADDR_ANY") {
-    local_sdk_addr_.sin_port = inet_addr(sdk_addr_.c_str());
-    if (local_sdk_addr_.sin_port == 0) {
+    local_sdk_addr_.sin_addr.s_addr = inet_addr(sdk_addr_.c_str());
+    if (local_sdk_addr_.sin_addr.s_addr == INADDR_NONE) {
       std::cerr << "Invalid sdk_addr: " << sdk_addr_ << ", aborting\n";
       abort();
     }
@@ -206,6 +207,21 @@ void MavlinkInterface::SendSensorMessages(uint64_t time_usec) {
     if (data.baro_updated | data.diff_press_updated | data.mag_updated | data.imu_updated) {
       SendSensorMessages(time_usec, data);
     }
+  }
+}
+
+void MavlinkInterface::SendHeartbeat() {
+  // In order to start the mavlink instance on Pixhawk over USB, we need to send heartbeats.
+  if (hil_mode_) {
+    mavlink_message_t msg;
+    mavlink_msg_heartbeat_pack_chan(
+      1, 200,
+      MAVLINK_COMM_0,
+      &msg,
+      MAV_TYPE_GENERIC,
+      MAV_AUTOPILOT_INVALID,
+      0, 0, 0);
+    send_mavlink_message(&msg);
   }
 }
 
@@ -495,10 +511,18 @@ void MavlinkInterface::acceptConnections()
 void MavlinkInterface::handle_message(mavlink_message_t *msg)
 {
   switch (msg->msgid) {
+  case MAVLINK_MSG_ID_HEARTBEAT:
+    handle_heartbeat(msg);
+    break;
   case MAVLINK_MSG_ID_HIL_ACTUATOR_CONTROLS:
     handle_actuator_controls(msg);
     break;
   }
+}
+
+void MavlinkInterface::handle_heartbeat(mavlink_message_t *)
+{
+  received_heartbeats_ = true;
 }
 
 void MavlinkInterface::handle_actuator_controls(mavlink_message_t *msg)

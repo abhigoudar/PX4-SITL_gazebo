@@ -349,6 +349,21 @@ void GimbalControllerPlugin::Load(physics::ModelPtr _model,
           << cameraImuSensorName << "' " << endl;
   }
 
+  const char *host_ip = std::getenv("PX4_VIDEO_HOST_IP");
+  if (host_ip) {
+    this->udp_gimbal_host_ip = std::string(host_ip);
+  } else if (this->sdf->HasElement("udp_gimbal_host_ip")) {
+    this->udp_gimbal_host_ip =  _sdf->Get<std::string>("udp_gimbal_host_ip");
+  } else {
+    this->udp_gimbal_host_ip = "127.0.0.1";
+  }
+
+  if (this->sdf->HasElement("udp_gimbal_port_remote")) {
+    this->udp_gimbal_port_remote = _sdf->Get<int>("udp_gimbal_port_remote");
+  } else {
+    this->udp_gimbal_port_remote = 13030;
+  }
+  gzwarn << "[gazebo_gimbal_controller_plugin] Streaming gimbal mavlink stream to ip: " << this->udp_gimbal_host_ip  << " port: " << this->udp_gimbal_port_remote << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -654,9 +669,9 @@ void GimbalControllerPlugin::SendGimbalDeviceInformation()
     mavlinkChannel,
     &msg,
     timeMs,
-    "PX4",
-    "Gazebo SITL",
-    "", // custom_name
+    std::string("PX4").c_str(),
+    std::string("Gazebo SITL").c_str(),
+    std::string("").c_str(), // custom_name
     firmwareVersion,
     hardwareVersion,
     uid,
@@ -719,7 +734,9 @@ void GimbalControllerPlugin::SendGimbalDeviceAttitudeStatus()
     angularVelocity.X(),
     angularVelocity.Y(),
     angularVelocity.Z(),
-    failureFlags);
+    failureFlags,
+    NAN, // per mavlink spec - NAN if unknown
+    NAN); // per mavlink spec - NAN if unknown
   SendMavlinkMessage(msg);
 }
 
@@ -747,8 +764,8 @@ void GimbalControllerPlugin::SendMavlinkMessage(const mavlink_message_t &msg)
 
   sockaddr_in dest_addr {};
   dest_addr.sin_family = AF_INET;
-  inet_pton(AF_INET, "127.0.0.1", &dest_addr.sin_addr.s_addr);
-  dest_addr.sin_port = htons(13030);
+  inet_pton(AF_INET, this->udp_gimbal_host_ip.c_str(), &dest_addr.sin_addr.s_addr);
+  dest_addr.sin_port = htons(this->udp_gimbal_port_remote);
 
   const ssize_t len = sendto(this->sock, buffer, packetlen, 0, reinterpret_cast<sockaddr *>(&dest_addr), sizeof(dest_addr));
   if (len <= 0) {
@@ -832,8 +849,11 @@ void GimbalControllerPlugin::HandleGimbalDeviceSetAttitude(const mavlink_message
     this->yawRateSetpoint = NAN;
 
   } else {
-    float rollRad, pitchRad, yawRad;
-    mavlink_quaternion_to_euler(&set_attitude.q[0], &rollRad, &pitchRad, &yawRad);
+    const auto euler = detail::QtoZXY(ignition::math::Quaterniond(
+			    set_attitude.q[0], set_attitude.q[1], set_attitude.q[2], set_attitude.q[3]));
+    const float pitchRad = euler[0];
+    const float rollRad = euler[1];
+    const float yawRad = euler[2];
 
     const std::lock_guard<std::mutex> lock(setpointMutex);
     this->rollSetpoint = rollRad;
