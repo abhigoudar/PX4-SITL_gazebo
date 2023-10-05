@@ -354,7 +354,7 @@ link_libraries(mav_msgs nav_msgs std_msgs sensor_msgs)
 link_libraries(physics_msgs)
 
 add_library(gazebo_airspeed_plugin SHARED src/gazebo_airspeed_plugin.cpp)
-add_library(gazebo_camera_manager_plugin SHARED src/gazebo_camera_manager_plugin.cpp)
+# add_library(gazebo_camera_manager_plugin SHARED src/gazebo_camera_manager_plugin.cpp)
 add_library(gazebo_gps_plugin SHARED src/gazebo_gps_plugin.cpp)
 add_library(gazebo_groundtruth_plugin SHARED src/gazebo_groundtruth_plugin.cpp)
 add_library(gazebo_irlock_plugin SHARED src/gazebo_irlock_plugin.cpp)
@@ -367,7 +367,7 @@ add_library(gazebo_sonar_plugin SHARED src/gazebo_sonar_plugin.cpp)
 add_library(gazebo_uuv_plugin SHARED src/gazebo_uuv_plugin.cpp)
 add_library(gazebo_vision_plugin SHARED src/gazebo_vision_plugin.cpp)
 add_library(gazebo_controller_interface SHARED src/gazebo_controller_interface.cpp)
-add_library(gazebo_gimbal_controller_plugin SHARED src/gazebo_gimbal_controller_plugin.cpp)
+# add_library(gazebo_gimbal_controller_plugin SHARED src/gazebo_gimbal_controller_plugin.cpp)
 add_library(gazebo_imu_plugin SHARED src/gazebo_imu_plugin.cpp)
 add_library(gazebo_mavlink_interface SHARED src/gazebo_mavlink_interface.cpp src/mavlink_interface.cpp)
 add_library(gazebo_motor_model SHARED src/gazebo_motor_model.cpp)
@@ -384,7 +384,7 @@ add_library(gazebo_drop_plugin SHARED src/gazebo_drop_plugin.cpp)
 
 set(plugins
   gazebo_airspeed_plugin
-  gazebo_camera_manager_plugin
+  # gazebo_camera_manager_plugin
   gazebo_gps_plugin
   gazebo_groundtruth_plugin
   gazebo_irlock_plugin
@@ -397,7 +397,7 @@ set(plugins
   gazebo_uuv_plugin
   gazebo_vision_plugin
   gazebo_controller_interface
-  gazebo_gimbal_controller_plugin
+  # gazebo_gimbal_controller_plugin
   gazebo_imu_plugin
   gazebo_mavlink_interface
   gazebo_motor_model
