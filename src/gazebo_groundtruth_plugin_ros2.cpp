@@ -57,6 +57,7 @@ void GroundtruthPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 {
   // Store the ptr to the model
   model_ = _model;
+  model_name_ = model_->GetName();
   // Store the ptr to the world
   world_ = model_->GetWorld();
 
@@ -114,10 +115,11 @@ void GroundtruthPlugin::OnUpdate(const common::UpdateInfo&)
   #endif
   // TODO: Fix frame ids
   nav_msgs::msg::Odometry msg;
-  msg.header.stamp.sec = current_time.sec;
-  msg.header.stamp.nanosec = current_time.nsec;
+  // msg.header.stamp.sec = current_time.sec;
+  // msg.header.stamp.nanosec = current_time.nsec;
+  msg.header.stamp = ros_node_->get_clock()->now();
   msg.header.frame_id = "world";
-  msg.child_frame_id = "base_link";
+  msg.child_frame_id = model_name_;
   msg.pose.pose.position.x = T_W_I.Pos().X();
   msg.pose.pose.position.y = T_W_I.Pos().Y();
   msg.pose.pose.position.z = T_W_I.Pos().Z();

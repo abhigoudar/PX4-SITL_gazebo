@@ -335,9 +335,10 @@ void GazeboImuPlugin::OnUpdate(const common::UpdateInfo& _info) {
   imu_pub_->Publish(imu_message_);
   // popluate ROS2 message
   // Fix the frame id
-  imu_msg_ros_.header.frame_id = "base_link";
-  imu_msg_ros_.header.stamp.sec = _info.simTime.sec ;
-  imu_msg_ros_.header.stamp.nanosec = _info.simTime.nsec;
+  imu_msg_ros_.header.frame_id = model_name_;
+  imu_msg_ros_.header.stamp = ros_node_->get_clock()->now();
+  // imu_msg_ros_.header.stamp.sec = _info.simTime.sec ;
+  // imu_msg_ros_.header.stamp.nanosec = _info.simTime.nsec;
   imu_msg_ros_.linear_acceleration.x = linear_acceleration_I[0];
   imu_msg_ros_.linear_acceleration.y = linear_acceleration_I[1];
   imu_msg_ros_.linear_acceleration.z = linear_acceleration_I[2];

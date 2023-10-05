@@ -76,6 +76,7 @@ protected:
 
 private:
   std::string namespace_;
+  std::string model_name_;
   physics::ModelPtr model_;
   physics::WorldPtr world_;
   event::ConnectionPtr updateConnection_;
