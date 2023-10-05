@@ -427,8 +427,8 @@
       <child>gps0::link</child>
       <parent>base_link</parent>
     </joint>
-    <plugin name='groundtruth_plugin' filename='libgazebo_groundtruth_plugin.so'>
-      <robotNamespace/>
+    <plugin name='groundtruth_plugin' filename='libgazebo_groundtruth_plugin_ros.so'>
+      <robotNamespace></robotNamespace>
     </plugin>
     <plugin name='magnetometer_plugin' filename='libgazebo_magnetometer_plugin.so'>
       <robotNamespace/>
@@ -564,7 +564,7 @@
       </control_channels>
     </plugin>
     <static>0</static>
-    <plugin name='rotors_gazebo_imu_plugin' filename='libgazebo_imu_plugin.so'>
+    <plugin name='rotors_gazebo_imu_plugin' filename='libgazebo_imu_plugin_ros.so'>
       <robotNamespace/>
       <linkName>/imu_link</linkName>
       <imuTopic>/imu</imuTopic>
