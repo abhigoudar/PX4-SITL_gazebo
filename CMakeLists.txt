@@ -37,7 +37,7 @@ include(GNUInstallDirs)
 #######################
 
 option(BUILD_GSTREAMER_PLUGIN "enable gstreamer plugin" ON)
-option(BUILD_ROS_PLUGINS "Enable building ROS dependent plugins" OFF)
+option(BUILD_ROS2_PLUGINS "Enable building ROS2 dependent plugins" ON)
 option(GENERATE_ROS_MODELS "Generate model sdf for ROS environment" OFF)
 
 option(SEND_VISION_ESTIMATION_DATA "Send Mavlink VISION_POSITION_ESTIMATE msgs" OFF)
@@ -103,12 +103,15 @@ link_directories(${GAZEBO_LIBRARY_DIRS})
 add_subdirectory( external/OpticalFlow OpticalFlow )
 set( OpticalFlow_LIBS "OpticalFlow" )
 
-# for ROS subscribers and publishers
-if (BUILD_ROS_PLUGINS)
+# for ROS2 subscribers and publishers
+if (BUILD_ROS2_PLUGINS)
+  find_package(ament_cmake REQUIRED)
   find_package(geometry_msgs REQUIRED)
-  find_package(roscpp REQUIRED)
+  find_package(rclcpp REQUIRED)
   find_package(sensor_msgs REQUIRED)
+  find_package(nav_msgs REQUIRED)
 endif()
+
 
 # find MAVLink
 find_package(MAVLink)
@@ -407,24 +410,53 @@ foreach(plugin ${plugins})
 endforeach()
 target_link_libraries(gazebo_opticalflow_plugin ${OpticalFlow_LIBS})
 
-# If BUILD_ROS_PLUGINS set to ON, build plugins that have ROS dependencies
+# If BUILD_ROS2_PLUGINS set to ON, build plugins that have ROS dependencies
 # Current plugins that can be used with ROS interface: gazebo_motor_failure_plugin
-if (BUILD_ROS_PLUGINS)
-  add_library(gazebo_motor_failure_plugin SHARED src/gazebo_motor_failure_plugin.cpp)
-  target_link_libraries(gazebo_motor_failure_plugin ${GAZEBO_libraries} ${roscpp_LIBRARIES})
-  list(APPEND plugins gazebo_motor_failure_plugin)
-  message(STATUS "adding gazebo_motor_failure_plugin to build")
+if (BUILD_ROS2_PLUGINS)
+  # add_library(gazebo_motor_failure_plugin SHARED src/gazebo_motor_failure_plugin.cpp)
+  add_library(gazebo_imu_plugin_ros SHARED src/gazebo_imu_plugin_ros2.cpp)
+  add_library(gazebo_groundtruth_plugin_ros SHARED src/gazebo_groundtruth_plugin_ros2.cpp)
 
+  target_link_libraries(
+    # gazebo_motor_failure_plugin 
+    gazebo_imu_plugin_ros
+    gazebo_groundtruth_plugin_ros
+    ${GAZEBO_libraries} 
+    ${rclcpp_LIBRARIES})
+
+  list(APPEND plugins 
+    # gazebo_motor_failure_plugin
+    gazebo_imu_plugin_ros
+    gazebo_groundtruth_plugin_ros
+  )
+  # message(STATUS "adding gazebo_motor_failure_plugin to build")
+  message(STATUS "adding gazebo_imu_plugin_ros to build")
+  message(STATUS "adding gazebo_groundtruth_plugin_ros to build")
   include_directories(
     include
     ${geometry_msgs_INCLUDE_DIRS}
     ${sensor_msgs_INCLUDE_DIRS}
+    ${rclcpp_INCLUDE_DIRS}
   )
 
-  target_link_libraries(gazebo_motor_failure_plugin
-    ${catkin_LIBRARIES}
-    ${roscpp_LIBRARIES}
+  target_link_libraries(
+      gazebo_imu_plugin_ros
+      gazebo_groundtruth_plugin_ros
+      # gazebo_motor_failure_plugin
+    ${ament_LIBRARIES}
+    ${rclcpp_LIBRARIES}
     ${GAZEBO_libraries}
+  )
+
+  ament_target_dependencies(
+    gazebo_imu_plugin_ros
+    rclcpp
+    sensor_msgs
+  )
+  ament_target_dependencies(
+    gazebo_groundtruth_plugin_ros
+    rclcpp
+    nav_msgs
   )
 endif()
 
